@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Planning Assistant</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Task Planning Assistant</h1>
+            <div class="confidence-meter">
+                <span>Agent Confidence:</span>
+                <div class="confidence-bar">
+                    <div class="confidence-fill" id="confidenceFill"></div>
+                </div>
+                <span id="confidenceText">80%</span>
+            </div>
+        </header>
+
+        <main>
+            <!-- Agent Response Area (120 char limit) -->
+            <div class="agent-response" id="agentResponse">
+                <div class="response-text" id="responseText">Ready to help you plan tasks</div>
+                <div class="response-actions" id="responseActions"></div>
+            </div>
+
+            <!-- Task Input Section -->
+            <div class="input-section">
+                <input type="text" id="taskInput" placeholder="Enter a new task..." maxlength="100">
+                <button onclick="createTask()" class="btn-primary">Create Task</button>
+            </div>
+
+            <!-- Task List -->
+            <div class="task-list" id="taskList">
+                <h3>Your Tasks</h3>
+                <div id="tasks"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-panel">
+                <button onclick="getSuggestion()" class="btn-secondary">Get Suggestion</button>
+                <button onclick="retryAction()" class="btn-secondary">Retry</button>
+                <button onclick="clearTasks()" class="btn-danger">Clear All</button>
+            </div>
+
+            <!-- System State Display -->
+            <div class="state-panel">
+                <h4>System State</h4>
+                <div id="stateDisplay"></div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

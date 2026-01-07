@@ -1,0 +1,268 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+h1 {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.confidence-meter {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.confidence-bar {
+    width: 200px;
+    height: 20px;
+    background: #ecf0f1;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.confidence-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #e74c3c, #f39c12, #27ae60);
+    transition: width 0.3s ease;
+    width: 80%;
+}
+
+.agent-response {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    border-left: 4px solid #3498db;
+}
+
+.response-text {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 10px;
+    min-height: 25px;
+    max-width: 120ch;
+    word-wrap: break-word;
+}
+
+.response-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.input-section {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+#taskInput {
+    flex: 1;
+    padding: 12px;
+    border: 2px solid #ecf0f1;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#taskInput:focus {
+    outline: none;
+    border-color: #3498db;
+}
+
+.btn-primary {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+}
+
+.btn-primary:hover {
+    background: #2980b9;
+}
+
+.btn-secondary {
+    background: #95a5a6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.btn-secondary:hover {
+    background: #7f8c8d;
+}
+
+.btn-danger {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+}
+
+.btn-danger:hover {
+    background: #c0392b;
+}
+
+.btn-small {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.btn-small:hover {
+    background: #229954;
+}
+
+.task-list, .action-panel, .state-panel {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.task-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    border-left: 4px solid #27ae60;
+}
+
+.task-item.completed {
+    opacity: 0.6;
+    border-left-color: #95a5a6;
+}
+
+.task-header {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.task-text {
+    font-weight: 500;
+    flex: 1;
+}
+
+.task-text.clickable {
+    cursor: pointer;
+    color: #3498db;
+    transition: color 0.2s;
+}
+
+.task-text.clickable:hover {
+    color: #2980b9;
+    text-decoration: underline;
+}
+
+.task-actions {
+    display: flex;
+    gap: 5px;
+}
+
+.subtasks {
+    margin-top: 10px;
+    padding-left: 20px;
+}
+
+.subtask {
+    padding: 5px 0;
+    font-size: 14px;
+    color: #666;
+}
+
+.subtask.completed {
+    text-decoration: line-through;
+    color: #999;
+}
+
+.action-panel {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.state-panel {
+    font-family: monospace;
+    font-size: 12px;
+    background: #2c3e50;
+    color: #ecf0f1;
+}
+
+.state-panel h4 {
+    color: #3498db;
+    margin-bottom: 10px;
+}
+
+.status-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    margin-right: 5px;
+}
+
+.status-success { background: #27ae60; }
+.status-warning { background: #f39c12; }
+.status-error { background: #e74c3c; }
+.status-info { background: #3498db; }
+
+@media (max-width: 600px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .input-section {
+        flex-direction: column;
+    }
+    
+    .action-panel {
+        flex-direction: column;
+    }
+}

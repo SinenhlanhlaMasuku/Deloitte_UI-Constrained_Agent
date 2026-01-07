@@ -1,0 +1,17 @@
+{
+  "name": "ui-constrained-agent",
+  "version": "1.0.0",
+  "description": "Task Planning Assistant with UI-constrained agent responses",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ws": "^8.14.2"
+  },
+  "keywords": ["agent", "ui", "task-planning"],
+  "author": "Deloitte Assessment",
+  "license": "MIT"
+}
