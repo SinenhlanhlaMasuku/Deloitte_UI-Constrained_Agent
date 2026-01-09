@@ -1,14 +1,17 @@
-# Task Planning Assistant
+## Running the App
 
-A simple web app where the UI controls what the AI agent can do. The agent can't just chat freely - it has to follow specific rules set by the interface.
+This project is intentionally lightweight and uses in-memory state.
+No database or external services are required.
 
-## How to Run
-
-```bash
+### Steps
 npm install
 npm start
-# Go to http://localhost:3000
-```
+
+Open http://localhost:3000
+
+
+## Design Trade-offs
+- No database used to keep focus on agent logic and UI constraints
 
 ## System Design: UI vs Agent vs Memory
 
