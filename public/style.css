@@ -143,6 +143,21 @@ h1 {
     background: #c0392b;
 }
 
+.btn-delete {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 4px 6px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-left: 5px;
+}
+
+.btn-delete:hover {
+    background: #c0392b;
+}
+
 .btn-small {
     background: #27ae60;
     color: white;
@@ -157,12 +172,54 @@ h1 {
     background: #229954;
 }
 
-.task-list, .action-panel, .state-panel {
+.task-list {
     background: white;
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     margin-bottom: 20px;
+}
+
+#tasks {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+#tasks::-webkit-scrollbar {
+    width: 8px;
+}
+
+#tasks::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+#tasks::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+#tasks::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+.action-panel, .state-panel {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.task-item.suggested {
+    border-left-color: #f39c12;
+    background: #fef9e7;
+}
+
+.task-item.suggested::before {
+    content: "💡 ";
+    color: #f39c12;
 }
 
 .task-item {

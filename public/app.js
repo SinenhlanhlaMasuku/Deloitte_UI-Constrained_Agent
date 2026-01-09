@@ -58,14 +58,9 @@ class UIConstrainedAgent {
                     message.data.action,
                     message.data.reason
                 );
-                if (message.state) {
-                    this.state = message.state;
-                    this.updateUI();
-                }
                 break;
             case 'state':
                 this.state = message.data;
-                this.updateUI();
                 break;
             case 'error':
                 this.updateResponse(
@@ -76,6 +71,11 @@ class UIConstrainedAgent {
                 );
                 break;
         }
+        // Always update state and UI after any message
+        if (message.state) {
+            this.state = message.state;
+        }
+        this.updateUI();
     }
 
     // Constraint: Maximum 120 characters per response
@@ -160,11 +160,7 @@ class UIConstrainedAgent {
                 });
                 break;
             case 'suggestion':
-                buttons.push({
-                    text: 'Apply',
-                    class: 'btn-small',
-                    action: () => this.applySuggestion()
-                });
+                // Remove the Apply button - suggestions are now auto-added as tasks
                 break;
         }
         
@@ -228,14 +224,15 @@ class UIConstrainedAgent {
 
     createTaskElement(task) {
         const div = document.createElement('div');
-        div.className = `task-item ${task.completed ? 'completed' : ''}`;
+        div.className = `task-item ${task.completed ? 'completed' : ''} ${task.suggested ? 'suggested' : ''}`;
         
         div.innerHTML = `
             <div class="task-header">
-                <span class="task-text clickable" onclick="agent.selectTask(${task.id})">${task.text}</span>
+                <span class="task-text clickable" onclick="agent.editTask(${task.id})">${task.text}</span>
                 <div class="task-actions">
-                    ${!task.completed ? `<button class="btn-small" onclick="agent.breakDownTask(${task.id})">Break Down</button>` : ''}
-                    ${!task.completed ? `<button class="btn-small" onclick="agent.markComplete(${task.id})">Complete</button>` : ''}
+                    ${!task.completed ? `<button class="btn-small" onclick="event.stopPropagation(); agent.breakDownTask(${task.id})">Break Down</button>` : ''}
+                    ${!task.completed ? `<button class="btn-small" onclick="event.stopPropagation(); agent.markComplete(${task.id})">Complete</button>` : ''}
+                    <button class="btn-delete" onclick="event.stopPropagation(); agent.deleteTask(${task.id})" title="Delete task">🗑️</button>
                 </div>
             </div>
             ${task.subtasks && task.subtasks.length > 0 ? this.renderSubtasks(task.subtasks) : ''}
@@ -315,6 +312,23 @@ class UIConstrainedAgent {
     markCurrentTaskComplete() {
         if (this.state.currentTask) {
             this.markComplete(this.state.currentTask.id);
+        }
+    }
+
+    deleteTask(taskId) {
+        if (confirm('Delete this task?')) {
+            this.sendMessage(taskId, 'delete_task');
+        }
+    }
+
+    editTask(taskId) {
+        const task = this.state.tasks.find(t => t.id === taskId);
+        if (!task) return;
+        
+        const newText = prompt('Edit task:', task.text);
+        if (newText && newText.trim() && newText.trim() !== task.text) {
+            const data = JSON.stringify({ taskId, newText: newText.trim() });
+            this.sendMessage(data, 'edit_task');
         }
     }
 

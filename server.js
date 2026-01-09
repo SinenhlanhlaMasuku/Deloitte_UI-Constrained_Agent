@@ -24,6 +24,8 @@ class TaskAgent {
       'mark_complete': this.markComplete(input),
       'select_task': this.selectTask(input),
       'get_suggestion': this.getSuggestion(),
+      'edit_task': this.editTask(input),
+      'delete_task': this.deleteTask(input),
       'retry': this.retry()
     };
     
@@ -133,25 +135,80 @@ class TaskAgent {
   }
 
   getSuggestion() {
-    const incompleteTasks = this.tasks.filter(t => !t.completed);
-    if (incompleteTasks.length === 0) {
-      return { text: 'No pending tasks', confidence: 0.6, action: 'info' };
-    }
-    
     const suggestions = [
-      'Focus on high priority tasks first to maximize productivity and ensure critical deliverables are completed on time',
-      'Break down complex tasks into smaller, manageable subtasks to reduce cognitive load and improve completion rates',
-      'Set specific time limits for each task to maintain focus and prevent scope creep during execution',
-      'Review progress regularly and adjust priorities based on changing requirements and stakeholder feedback'
+      'Review and prioritize pending tasks',
+      'Schedule focused work blocks',
+      'Update project documentation',
+      'Plan next week activities',
+      'Organize workspace and files',
+      'Follow up on pending communications'
     ];
     
     const suggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+    
+    // Create the suggested task
+    const task = {
+      id: Date.now(),
+      text: suggestion,
+      subtasks: [],
+      completed: false,
+      created: new Date(),
+      suggested: true
+    };
+    
+    this.tasks.push(task);
     this.confidence = 0.7;
     
     return {
-      text: suggestion, // This will be >120 chars to test truncation
+      text: `Added: "${suggestion}"`,
       confidence: this.confidence,
-      action: 'suggestion'
+      action: 'task_created',
+      taskId: task.id
+    };
+  }
+
+  deleteTask(taskId) {
+    const taskIndex = this.tasks.findIndex(t => t.id == taskId);
+    if (taskIndex === -1) {
+      return { text: 'Task not found', confidence: 0.1, action: 'error' };
+    }
+    
+    const task = this.tasks[taskIndex];
+    this.tasks.splice(taskIndex, 1);
+    
+    if (this.currentTask && this.currentTask.id == taskId) {
+      this.currentTask = null;
+    }
+    
+    this.confidence = 0.9;
+    
+    return {
+      text: `Deleted: "${task.text.substring(0, 50)}..."`,
+      confidence: this.confidence,
+      action: 'task_deleted'
+    };
+  }
+
+  editTask(data) {
+    const { taskId, newText } = JSON.parse(data);
+    const task = this.tasks.find(t => t.id == taskId);
+    
+    if (!task) {
+      return { text: 'Task not found', confidence: 0.1, action: 'error' };
+    }
+    
+    if (!newText || newText.length < 3) {
+      return { text: 'Task text too short', confidence: 0.2, action: 'error' };
+    }
+    
+    task.text = newText.substring(0, 100);
+    this.confidence = 0.8;
+    
+    return {
+      text: `Updated: "${task.text}"`,
+      confidence: this.confidence,
+      action: 'task_updated',
+      taskId: task.id
     };
   }
 
