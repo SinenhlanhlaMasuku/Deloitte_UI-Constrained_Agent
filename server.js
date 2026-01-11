@@ -26,6 +26,7 @@ class TaskAgent {
       'get_suggestion': this.getSuggestion(),
       'edit_task': this.editTask(input),
       'delete_task': this.deleteTask(input),
+      'clear_all': this.clearAll(),
       'retry': this.retry()
     };
     
@@ -209,6 +210,18 @@ class TaskAgent {
       confidence: this.confidence,
       action: 'task_updated',
       taskId: task.id
+    };
+  }
+
+  clearAll() {
+    this.tasks = [];
+    this.currentTask = null;
+    this.confidence = 0.8;
+    
+    return {
+      text: 'All tasks cleared',
+      confidence: this.confidence,
+      action: 'tasks_cleared'
     };
   }
 

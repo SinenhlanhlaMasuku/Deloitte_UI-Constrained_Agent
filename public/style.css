@@ -215,11 +215,21 @@ h1 {
 .task-item.suggested {
     border-left-color: #f39c12;
     background: #fef9e7;
+    position: relative;
 }
 
 .task-item.suggested::before {
-    content: "💡 ";
+    content: "💡 SUGGESTED";
     color: #f39c12;
+    font-size: 11px;
+    font-weight: bold;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: #fff3cd;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #f39c12;
 }
 
 .task-item {
@@ -231,8 +241,28 @@ h1 {
 }
 
 .task-item.completed {
-    opacity: 0.6;
-    border-left-color: #95a5a6;
+    opacity: 0.7;
+    border-left-color: #27ae60;
+    background: #d5f4e6;
+    position: relative;
+}
+
+.task-item.completed::after {
+    content: "✓ COMPLETED";
+    color: #27ae60;
+    font-size: 11px;
+    font-weight: bold;
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    background: #d4edda;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #27ae60;
+}
+
+.task-item.completed .task-text {
+    text-decoration: line-through;
 }
 
 .task-header {
