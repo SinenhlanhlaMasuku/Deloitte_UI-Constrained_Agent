@@ -1,19 +1,19 @@
-## Running the App
+# Running the App
 
 This project is intentionally lightweight and uses in-memory state.
 No database or external services are required.
 
-### Steps
+# Steps
 npm install
 npm start
 
 Open http://localhost:3000
 
 
-## Design Trade-offs
+# Design Trade-offs
 - No database used to keep focus on agent logic and UI constraints
 
-## System Design: UI vs Agent vs Memory
+# System Design: UI vs Agent vs Memory
 
 I split the system into three parts:
 
@@ -23,7 +23,7 @@ I split the system into three parts:
 
 This separation means the agent can't go rogue - the UI always stays in control.
 
-## Error Handling Example
+# Error Handling Example
 
 **What happens when something goes wrong:**
 
@@ -37,25 +37,25 @@ If a user tries to create an empty task:
 
 The system doesn't crash or lose data - it just guides the user to fix the problem.
 
-## Why This Can't Work as Regular Chat
+# Why This Can't Work as Regular Chat
 
-### 1. **No Length Control**
+# 1. No Length Control
 Regular chat lets AI write paragraphs. My system cuts off at exactly 120 characters, forcing short, clear responses.
 
-### 2. **No Structure**
+# 2. No Structure
 Chat is just text back and forth. My system uses:
 - Forms that prevent bad input
 - Buttons that eliminate confusion
 - Visual indicators for immediate feedback
 
-### 3. **No Visual State**
+# 3. No Visual State
 Chat can't show:
 - How confident the AI is right now
 - Task progress at a glance
 - System status with colors
 - Error states visually
 
-### 4. **Fake Confidence**
+# 4. Fake Confidence
 Most chat AI acts confident even when it shouldn't. My system:
 - Shows uncertainty with a confidence meter
 - Drops confidence when tasks get complex
