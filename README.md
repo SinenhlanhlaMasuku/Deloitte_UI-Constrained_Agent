@@ -17,17 +17,6 @@ Open http://localhost:3000
 
 I split the system into three parts:
 
-```
-┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│       UI        │    │      Agent       │    │     Memory      │
-│                 │    │                  │    │                 │
-│ • Input Forms   │◄──►│ • Task Logic     │◄──►│ • Task List     │
-│ • Action Buttons│    │ • Response Gen   │    │ • Current State │
-│ • Status Display│    │ • Confidence     │    │ • Confidence    │
-│ • Constraints   │    │ • State Updates  │    │ • Session Data  │
-└─────────────────┘    └──────────────────┘    └─────────────────┘
-```
-
 **UI**: Controls everything the agent can do - limits responses to 120 characters, only shows specific buttons
 **Agent**: Handles the task logic and decides what to respond, but can't break UI rules
 **Memory**: Keeps track of all tasks, completion status, and how confident the agent is
