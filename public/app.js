@@ -260,10 +260,38 @@ class UIConstrainedAgent {
         this.updateUI();
     }
 
-    // Intelligent confidence analysis system
+    // Enhanced confidence analysis with edge case detection
     analyzeTaskConfidence(taskText) {
         const text = taskText.toLowerCase().trim();
         let confidence = 0.2; // Start very low
+        let flags = [];
+        
+        // Edge case detection first
+        if (this.detectMalformedInput(text)) {
+            flags.push('malformed');
+            return { confidence: 0.1, flags, reason: 'Invalid input format detected' };
+        }
+        
+        if (this.detectContradictoryInput(text)) {
+            flags.push('contradictory');
+            return { confidence: 0.15, flags, reason: 'Contradictory requirements detected' };
+        }
+        
+        if (this.detectUnsafeInput(text)) {
+            flags.push('unsafe');
+            return { confidence: 0.1, flags, reason: 'Unsafe or unethical request detected' };
+        }
+        
+        if (this.detectOverbroadInput(text)) {
+            flags.push('overbroad');
+            return { confidence: 0.2, flags, reason: 'Task scope too broad for autonomous execution' };
+        }
+        
+        // Vagueness detection
+        if (this.detectVagueInput(text)) {
+            flags.push('vague');
+            confidence = Math.max(0.1, confidence - 0.3);
+        }
         
         // Length and detail analysis
         const wordCount = text.split(/\s+/).length;
@@ -289,34 +317,91 @@ class UIConstrainedAgent {
         
         // Complexity indicators (reduce confidence)
         const complexityTerms = /\b(complex|advanced|sophisticated|enterprise|scalable|distributed|machine learning|ai)\b/.test(text);
-        if (complexityTerms) confidence -= 0.15;
-        
-        // Vague terms (reduce confidence)
-        const vagueTerms = /\b(something|stuff|things|maybe|probably|somehow|whatever)\b/.test(text);
-        if (vagueTerms) confidence -= 0.2;
+        if (complexityTerms) {
+            confidence -= 0.15;
+            flags.push('complex');
+        }
         
         // Cap between 0.1 and 0.85
-        return Math.max(0.1, Math.min(0.85, confidence));
+        confidence = Math.max(0.1, Math.min(0.85, confidence));
+        
+        return { confidence, flags, reason: this.getConfidenceReason(confidence, flags) };
     }
     
-    getTaskAnalysis(taskText) {
-        const confidence = this.analyzeTaskConfidence(taskText);
-        const text = taskText.toLowerCase();
+    // Edge case detection methods
+    detectMalformedInput(text) {
+        // Detect garbage input, excessive punctuation, or non-text
+        const excessivePunctuation = /[!?]{3,}|[.]{4,}|[#@$%^&*]{2,}/.test(text);
+        const onlySymbols = /^[^a-zA-Z0-9\s]+$/.test(text);
+        const tooShort = text.length < 2;
         
-        if (confidence >= 0.7) {
-            return { reason: 'Clear, specific task' };
-        } else if (confidence >= 0.5) {
-            return { reason: 'Good detail, some clarity' };
-        } else if (confidence >= 0.3) {
-            return { reason: 'Basic info, needs more detail' };
-        } else {
-            return { reason: 'Vague task, low confidence' };
-        }
+        return excessivePunctuation || onlySymbols || tooShort;
+    }
+    
+    detectContradictoryInput(text) {
+        // Detect contradictory requirements
+        const contradictions = [
+            /technical.*but.*no.*technical/,
+            /presentation.*but.*no.*present/,
+            /build.*but.*don't.*create/,
+            /detailed.*but.*simple/,
+            /complex.*but.*basic/
+        ];
+        
+        return contradictions.some(pattern => pattern.test(text));
+    }
+    
+    detectUnsafeInput(text) {
+        // Detect unsafe, unethical, or inappropriate requests
+        const unsafePatterns = [
+            /autonomous.*hiring.*without.*human/,
+            /replace.*human.*decision/,
+            /ignore.*rules|bypass.*constraint/,
+            /full.*autonomy.*without.*oversight/,
+            /make.*decisions.*without.*approval/
+        ];
+        
+        return unsafePatterns.some(pattern => pattern.test(text));
+    }
+    
+    detectOverbroadInput(text) {
+        // Detect impossibly broad or unrealistic scope
+        const overbroadPatterns = [
+            /solve.*all.*problems/,
+            /everything.*automatically/,
+            /complete.*solution.*for.*everything/,
+            /build.*system.*that.*does.*everything/,
+            /automate.*entire.*business/
+        ];
+        
+        return overbroadPatterns.some(pattern => pattern.test(text));
+    }
+    
+    detectVagueInput(text) {
+        // Detect vague or ambiguous language
+        const vagueTerms = /\b(something|stuff|things|maybe|probably|somehow|whatever|handle|deal with|work on)\b/;
+        const tooGeneric = /\b(do|make|create|build)\s+\w{1,4}\b/; // "do it", "make thing"
+        
+        return vagueTerms.test(text) || tooGeneric.test(text);
+    }
+    
+    getConfidenceReason(confidence, flags) {
+        if (flags.includes('malformed')) return 'Invalid input format';
+        if (flags.includes('contradictory')) return 'Contradictory requirements';
+        if (flags.includes('unsafe')) return 'Unsafe request - human oversight required';
+        if (flags.includes('overbroad')) return 'Scope too broad - needs constraints';
+        if (flags.includes('vague')) return 'Vague task - needs clarification';
+        if (flags.includes('complex')) return 'Complex task - proceed cautiously';
+        
+        if (confidence >= 0.7) return 'Clear, specific task';
+        if (confidence >= 0.5) return 'Good detail, some clarity';
+        if (confidence >= 0.3) return 'Basic info, needs more detail';
+        return 'Low confidence - needs refinement';
     }
     
     calculateBreakdownConfidence(taskText, subtaskCount) {
-        const baseConfidence = this.analyzeTaskConfidence(taskText);
-        let breakdownConfidence = baseConfidence;
+        const analysis = this.analyzeTaskConfidence(taskText);
+        let breakdownConfidence = analysis.confidence;
         
         // More subtasks = more complexity revealed = lower confidence initially
         if (subtaskCount >= 6) breakdownConfidence -= 0.2;
@@ -568,30 +653,51 @@ class UIConstrainedAgent {
         }
         
         if (taskText.length < 3) {
-            this.updateResponse('Task too short', 0.2, 'error');
+            this.updateResponse('Task too short - needs more detail', 0.2, 'error');
             return;
         }
         
-        // Analyze task confidence
-        const confidence = this.analyzeTaskConfidence(taskText);
-        const analysis = this.getTaskAnalysis(taskText);
+        // Enhanced analysis with edge case detection
+        const analysis = this.analyzeTaskConfidence(taskText);
         
-        // Create task immediately on client
+        // Handle edge cases with specific responses
+        if (analysis.flags.includes('malformed')) {
+            this.updateResponse('Invalid input format detected', 0.1, 'error');
+            return;
+        }
+        
+        if (analysis.flags.includes('contradictory')) {
+            this.updateResponse('Contradictory requirements - please clarify', 0.15, 'error');
+            return;
+        }
+        
+        if (analysis.flags.includes('unsafe')) {
+            this.updateResponse('Request requires human oversight - cannot proceed autonomously', 0.1, 'error');
+            return;
+        }
+        
+        if (analysis.flags.includes('overbroad')) {
+            this.updateResponse('Scope too broad - please add constraints', 0.2, 'error');
+            return;
+        }
+        
+        // Create task with enhanced analysis
         const task = {
             id: Date.now(),
             text: taskText.substring(0, 100),
             subtasks: [],
             completed: false,
-            created: new Date()
+            created: new Date(),
+            flags: analysis.flags
         };
         
         this.state.tasks.push(task);
         this.state.currentTask = task;
-        this.state.confidence = confidence;
+        this.state.confidence = analysis.confidence;
         
         // Update UI immediately
         this.updateUI();
-        this.updateResponse(`Task created. ${analysis.reason}`, confidence, 'task_created');
+        this.updateResponse(`Task created. ${analysis.reason}`, analysis.confidence, 'task_created');
         
         // Clear input
         input.value = '';
@@ -659,6 +765,11 @@ class UIConstrainedAgent {
         const newText = prompt('Edit task:', task.text);
         if (newText && newText.trim() && newText.trim() !== task.text) {
             const data = JSON.stringify({ taskId, newText: newText.trim() });
+            
+            // Handle locally first
+            this.editTaskLocal(data);
+            
+            // Send to server for sync
             this.sendMessage(data, 'edit_task');
         }
     }
@@ -672,7 +783,17 @@ class UIConstrainedAgent {
     }
 
     retryAction() {
-        this.sendMessage('', 'retry');
+        // Clear any error state and reset to ready
+        this.state.confidence = 0.8;
+        this.updateResponse('Ready to help you plan tasks', 0.8, 'info');
+        
+        // Clear task input if there's an error there
+        const input = document.getElementById('taskInput');
+        if (input.value.trim().length < 3) {
+            input.value = '';
+        }
+        
+        this.updateUI();
     }
 
     applySuggestion() {
